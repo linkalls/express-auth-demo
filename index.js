@@ -60,13 +60,19 @@ app.post("/login",async(req,res)=>{
  }
 })
 
+app.post("/logout",(req,res)=>{
+  req.session.user_id = null
+  res.redirect("/login")
+})
 
 app.get("/secret", (req, res) => {
   if(!req.session.user_id){
    return res.redirect("/login")
   }
-  res.send("ここはログインユーザーしか見れないページだよ")
+  res.render("secret")
 })
+
+
 
 app.listen(3000, () => {
   console.log("port3000で起動中")
