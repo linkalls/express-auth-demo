@@ -19,9 +19,9 @@ userSchema.statics.findAndValidate = async function (username, password) {
   return isValid ? foundUser : false //* trueならfoundUserがfalseならfalseが返ってくる
 } //* 自分でstaticsの下に設定したメゾットを作れる
 
-userSchema.pre("save", function(next) { //* arrow関数だとダメ
-  // this //* saveが行われた時のインスタンス
-  this.password = "hogehoge"
+userSchema.pre("save", async function(next) { //* arrow関数だとダメ
+  // this //* saveが行われた時のインスタンス userとか
+  this.password = await bcrypt.hash(this.password,12)
   next()
 }) //* save直前にやる
 
