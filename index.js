@@ -28,7 +28,7 @@ app.post("/register", async (req, res) => {
 const {username,password} = req.body
 const hash = await bcrypt.hash(password,12)
 // await new User(req.body) password bcryptで暗号化
-  res.redirect(hash)
+  res.send(hash)
 })
 
 app.get("/secret", (req, res) => {
