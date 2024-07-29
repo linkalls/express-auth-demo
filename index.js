@@ -3,6 +3,7 @@ const app = express()
 const User = require("./models/user")
 const mongoose = require("mongoose")
 const bcrypt = require("bcrypt")
+const session = require("express-session")
 
 mongoose
   .connect("mongodb://localhost:27017/authDemo", {
@@ -19,6 +20,7 @@ mongoose
 app.set("view engine", "ejs")
 app.set("views", "views")
 app.use(express.urlencoded({ extended: true }))
+app.use(session({secret: "mysecret"}))
 
 app.get("/",(req,res)=>{
   res.send("ホームページ")
@@ -36,6 +38,7 @@ app.post("/register", async (req, res) => {
     password: hash,
   })
   await user.save()
+  req.session.user_id = user._id
   res.redirect("/")
   // await new User(req.body) password bcryptで暗号化
   // res.send(hash)
@@ -47,18 +50,22 @@ app.get("/login",(req,res)=>{
 
 app.post("/login",async(req,res)=>{
  const {username,password} = req.body
- const user = await User.findOne({username}) //* findByIdはidないから無理
+ const user = await User.findOne({username}) //* findByIdはidわかってないから無理
  const validPassword = await bcrypt.compare(password,user.password)
  if(validPassword){
-  res.send("ようこそ")
+  req.session.user_id = user._id
+  res.redirect("/secret")
  } else{
-  res.send("失敗")
+  res.redirect("/login")
  }
 })
 
 
 app.get("/secret", (req, res) => {
-  res.send("ここはログイン済みの場合だけ見れる秘密のページです")
+  if(!req.session.user_id){
+   return res.redirect("/login")
+  }
+  res.send("ここはログインユーザーしか見れないページだよ")
 })
 
 app.listen(3000, () => {
