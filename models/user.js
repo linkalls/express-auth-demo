@@ -19,4 +19,10 @@ userSchema.statics.findAndValidate = async function (username, password) {
   return isValid ? foundUser : false //* trueならfoundUserがfalseならfalseが返ってくる
 } //* 自分でstaticsの下に設定したメゾットを作れる
 
+userSchema.pre("save", function(next) { //* arrow関数だとダメ
+  // this //* saveが行われた時のインスタンス
+  this.password = "hogehoge"
+  next()
+}) //* save直前にやる
+
 module.exports = mongoose.model("User", userSchema)

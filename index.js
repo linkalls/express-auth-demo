@@ -40,10 +40,9 @@ app.get("/register", (req, res) => {
 
 app.post("/register", async (req, res) => {
   const { username, password } = req.body
-  const hash = await bcrypt.hash(password, 12)
   const user = new User({
     username, //* username: usernameの省略記法
-    password: hash,
+    password,
   })
   await user.save()
   req.session.user_id = user._id
