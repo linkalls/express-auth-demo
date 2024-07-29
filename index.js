@@ -20,9 +20,17 @@ mongoose
 app.set("view engine", "ejs")
 app.set("views", "views")
 app.use(express.urlencoded({ extended: true }))
-app.use(session({secret: "mysecret"}))
+app.use(session({ secret: "mysecret" }))
 
-app.get("/",(req,res)=>{
+const requireLogin = (req, res, next) => {
+  //* ミドルウェア
+  if (!req.session.user_id) {
+    return res.redirect("/login")
+  }
+  next()
+}
+
+app.get("/", (req, res) => {
   res.send("ホームページ")
 })
 
@@ -44,35 +52,34 @@ app.post("/register", async (req, res) => {
   // res.send(hash)
 })
 
-app.get("/login",(req,res)=>{
+app.get("/login", (req, res) => {
   res.render("login")
 })
 
-app.post("/login",async(req,res)=>{
- const {username,password} = req.body
- const user = await User.findOne({username}) //* findByIdはidわかってないから無理
- const validPassword = await bcrypt.compare(password,user.password)
- if(validPassword){
-  req.session.user_id = user._id
-  res.redirect("/secret")
- } else{
-  res.redirect("/login")
- }
+app.post("/login", async (req, res) => {
+  const { username, password } = req.body
+  const user = await User.findOne({ username }) //* findByIdはidわかってないから無理
+  const validPassword = await bcrypt.compare(password, user.password)
+  if (validPassword) {
+    req.session.user_id = user._id
+    res.redirect("/secret")
+  } else {
+    res.redirect("/login")
+  }
 })
 
-app.post("/logout",(req,res)=>{
+app.post("/logout", (req, res) => {
   req.session.user_id = null
   res.redirect("/login")
 })
 
-app.get("/secret", (req, res) => {
-  if(!req.session.user_id){
-   return res.redirect("/login")
-  }
+app.get("/secret", requireLogin,(req, res) => {
   res.render("secret")
 })
 
-
+app.get("/topsecret",requireLogin,(req,res)=>{
+  res.send("TOP secret!!")
+})
 
 app.listen(3000, () => {
   console.log("port3000で起動中")
