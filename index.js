@@ -20,15 +20,25 @@ app.set("view engine", "ejs")
 app.set("views", "views")
 app.use(express.urlencoded({ extended: true }))
 
+app.get("/",(req,res)=>{
+  res.send("ホームページ")
+})
+
 app.get("/register", (req, res) => {
   res.render("register")
 })
 
 app.post("/register", async (req, res) => {
-const {username,password} = req.body
-const hash = await bcrypt.hash(password,12)
-// await new User(req.body) password bcryptで暗号化
-  res.send(hash)
+  const { username, password } = req.body
+  const hash = await bcrypt.hash(password, 12)
+  const user = new User({
+    username, //* username: usernameの省略記法
+    password: hash,
+  })
+  await user.save()
+  res.redirect("/")
+  // await new User(req.body) password bcryptで暗号化
+  // res.send(hash)
 })
 
 app.get("/secret", (req, res) => {
