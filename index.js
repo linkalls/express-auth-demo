@@ -41,6 +41,15 @@ app.post("/register", async (req, res) => {
   // res.send(hash)
 })
 
+app.get("/login",(req,res)=>{
+  res.render("login")
+})
+
+app.post("/login",(req,res)=>{
+  res.send(req.body)
+})
+
+
 app.get("/secret", (req, res) => {
   res.send("ここはログイン済みの場合だけ見れる秘密のページです")
 })
